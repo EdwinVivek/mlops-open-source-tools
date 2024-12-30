@@ -1,0 +1,281 @@
+{
+  "id": "0194098a-f33a-7824-85de-2589dcec2645",
+  "name": "house price project",
+  "description": null,
+  "dashboard": {
+    "name": "house price project",
+    "panels": [
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019409b5-d86e-75ca-833e-478ae8d06d14",
+        "title": "House price Monitoring dashboard",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "none",
+        "value": {
+          "field_path": "",
+          "metric_id": null,
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019409b5-e8d0-7c3c-ae5d-37dff8dc07fd",
+        "title": "Number of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "Drifted Columns",
+          "metric_id": "DatasetDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019409b6-6100-7e67-b179-672382b4f664",
+        "title": "Number of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "Drifted Columns",
+          "metric_id": "DatasetDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelPlot",
+        "id": "019409c0-99ff-7179-a20c-b41531729378",
+        "title": "Share of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "values": [
+          {
+            "field_path": "share_of_drifted_columns",
+            "metric_id": "DatasetDriftMetric",
+            "metric_fingerprint": null,
+            "metric_args": {},
+            "legend": "share"
+          }
+        ],
+        "plot_type": "line"
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019412f5-5094-7ffc-bd8e-9c8063437c31",
+        "title": "House price Monitoring dashboard",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 2,
+        "agg": "none",
+        "value": {
+          "field_path": "",
+          "metric_id": null,
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019412f5-50fb-7a22-8c5b-e0dad726ff69",
+        "title": "Number of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "Drifted Columns",
+          "metric_id": "DatasetDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelPlot",
+        "id": "019412f5-5156-7999-8404-f398e1ced090",
+        "title": "Share of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "values": [
+          {
+            "field_path": "share_of_drifted_columns",
+            "metric_id": "DatasetDriftMetric",
+            "metric_fingerprint": null,
+            "metric_args": {},
+            "legend": "share"
+          }
+        ],
+        "plot_type": "line"
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019412f7-db55-7731-aea9-5395778342c2",
+        "title": "House price Monitoring dashboard",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 2,
+        "agg": "none",
+        "value": {
+          "field_path": "",
+          "metric_id": null,
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019412f7-dc00-7b17-9f9c-24c65c5d465c",
+        "title": "Number of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "Drifted Columns",
+          "metric_id": "DatasetDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelPlot",
+        "id": "019412f7-dc82-7614-bdc0-6f5973c5db4a",
+        "title": "Share of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "values": [
+          {
+            "field_path": "share_of_drifted_columns",
+            "metric_id": "DatasetDriftMetric",
+            "metric_fingerprint": null,
+            "metric_args": {},
+            "legend": "share"
+          }
+        ],
+        "plot_type": "line"
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019412fa-f2a4-7a26-8e56-4a3634844e2a",
+        "title": "House price Monitoring dashboard",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 2,
+        "agg": "none",
+        "value": {
+          "field_path": "",
+          "metric_id": null,
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "019412fa-f3db-72f6-bd45-7c9dbbefaf8b",
+        "title": "Number of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "Drifted Columns",
+          "metric_id": "DatasetDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelPlot",
+        "id": "019412fa-f47f-7749-8f60-34fe2fac1269",
+        "title": "Share of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "values": [
+          {
+            "field_path": "share_of_drifted_columns",
+            "metric_id": "DatasetDriftMetric",
+            "metric_fingerprint": null,
+            "metric_args": {},
+            "legend": "share"
+          }
+        ],
+        "plot_type": "line"
+      }
+    ],
+    "tabs": [],
+    "tab_id_to_panel_ids": {}
+  },
+  "team_id": null,
+  "org_id": null,
+  "date_from": null,
+  "date_to": null,
+  "created_at": "2024-12-28T00:44:48.762540"
+}

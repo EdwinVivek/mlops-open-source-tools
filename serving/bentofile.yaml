@@ -1,0 +1,15 @@
+service: service:HouseService
+labels:
+    owner: edwin
+    stage: dev
+include:
+- "*.py"
+python:
+    packages:
+    - scikit-learn
+    - pandas
+    - numpy
+models:
+- "house_price_model:latest"
+- tag: "house_price_model:lixn5hwer6sq6dew"
+  alias: "house_alias"

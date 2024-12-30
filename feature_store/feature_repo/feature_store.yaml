@@ -1,0 +1,27 @@
+project: my_project
+provider: local
+registry:
+    registry_type: sql
+    registry_store_type: PostgreSQLRegistryStore
+    path: postgresql+psycopg://postgres:root@localhost:5432/feast_registry
+    cache_ttl_seconds: 60000
+    sqlalchemy_config_kwargs:
+        echo: false
+        pool_pre_ping: true
+online_store:
+    type: postgres
+    host: localhost
+    port: 5432
+    database: feast_online
+    db_schema: public
+    user: postgres
+    password: root
+offline_store:
+    type: postgres
+    host: localhost
+    port: 5432
+    database: feast_offline
+    db_schema: public
+    user: postgres
+    password: root
+entity_key_serialization_version: 2
