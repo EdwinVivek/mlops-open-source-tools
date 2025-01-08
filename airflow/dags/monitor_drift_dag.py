@@ -18,17 +18,22 @@ logging.basicConfig(
 def check_data_push():
     logging.info("enter method")
     # Command to activate the Conda environment and run the script
-    env_name = "base"
+    #env_name = "base"
+    #script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/monitor_drift.py"
+    #command = f'eval \"$(conda shell.bash hook)\" && conda activate {env_name} && python "{script_path}"'
+    #result = subprocess.run(command, capture_output=True, shell=True)
+
+    python_path = "/home/edwin/anaconda3/bin/python"
     script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/monitor_drift.py"
-    command = f'eval \"$(conda shell.bash hook)\" && conda activate {env_name} && python "{script_path}"'
-    result = subprocess.run(command, capture_output=True, shell=True)
-    if(result.stderr ==  ' '):
-        logging.info(result.stdout.decode())
-    else:
+
+    # Run the command using a list
+    result = subprocess.run([python_path, script_path], capture_output=True, text=True)
+    
+    if(result.stdout.endswith("Data pushed successfully\n")):
         logging.info(result.stderr)
-    if "Data pushed successfully" in result.stdout.decode():
         return "Push success"
     else:
+        logging.info(result.stderr)
         raise ValueError(result.stdout.decode())
 
 # Define the DAG
