@@ -20,7 +20,7 @@ class FeastFeatureStore:
         )
         return retrievalJob.to_df()
 
-    def materlialize(self,end_date, start_date=None, increment=False):
+    def materialize(self,end_date, start_date=None, increment=False):
         if not increment:
             #Code for loading features to online store between two dates
             self.store.materialize(

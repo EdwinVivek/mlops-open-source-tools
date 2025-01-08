@@ -101,12 +101,13 @@ class HousePricePrediction():
         self.save_df_to_postgres(X,y)
 
 
-    def save_df_to_postgres(self, X, y):
+    def save_df_to_postgres(self, X, y, mode='replace'):
         #connstr = 'postgresql+psycopg://postgres:Syncfusion%40123@localhost:5432/feast_offline'
-        connstr = 'postgresql+psycopg://postgres:root@localhost:5432/feast_offline'
+        connstr = 'postgresql+psycopg2://postgres:root@localhost:5432/feast_offline'
         engine = db.create_engine(connstr)
-        X.to_sql('house_features_sql', engine, if_exists='replace', index=False)
-        #y.to_sql('house_target_sql', engine, if_exists='replace', index=False)
+        X.to_sql('house_features_sql', engine, if_exists=mode, index=False)
+        y.to_sql('house_target_sql', engine, if_exists=mode, index=False)
+        print("Pushed data to offline store!")
 
 
     # <h2> Feast Feature store
@@ -115,24 +116,39 @@ class HousePricePrediction():
         print(store.store)
         return store
     
-    def execute_feauture_store(self, store=None):
-        if(store is None):
-            store = self.get_feature_store()
-        store.store.apply([house, house_features])
+    def execute_feauture_store(self, store=None): 
+        if(store is None): 
+            store = self.get_feature_store() 
+        self.get_historical_features(store) 
+        self.get_online_features(store) 
 
-        entity_df = store.get_entity_dataframe(path=os.path.join(os.getcwd() + "//feature_store//data//house_target.parquet"))
+    def get_historical_features(self, store=None, entity_df=None): 
+        if(store is None): 
+            store = self.get_feature_store() 
+            store.store.apply([house, house_features]) 
 
-        features=[
-            "house_features:area",
-            "house_features:bedrooms",
-            "house_features:mainroad"
-        ]
-        hist_df = store.get_historical_features(entity_df, features)
-        print(hist_df)
+        if (entity_df is None): 
+            entity_df = store.get_entity_dataframe(path=os.path.join(os.getcwd() + "//feature_store//data//house_target.parquet")) 
 
-        entity_rows = pd.DataFrame(entity_df["house_id"]).to_dict(orient="records")
-        online_df = store.get_online_features(entity_rows, features)
-        return online_df, entity_df["price"]
+        features=[ 
+            "house_features:area", 
+            "house_features:bedrooms", 
+            "house_features:mainroad" 
+        ] 
+        hist_df = store.get_historical_features(entity_df, features) 
+        return hist_df 
+ 
+    def get_online_features(self, store, entity_df=None): 
+        features=[ 
+            "house_features:area", 
+            "house_features:bedrooms", 
+            "house_features:mainroad" 
+        ] 
+        if (entity_df is None): 
+            entity_df = store.get_entity_dataframe(path=os.path.join(os.getcwd() + "//feature_store//data//house_target.parquet")) 
+        entity_rows = entity_df.to_dict(orient="records") 
+        online_df = store.get_online_features(entity_rows, features) 
+        return online_df
 
     def materialize(self, end_date = datetime.datetime.now(), start_date=None, increment=False, store=None):
         if(store is None):
