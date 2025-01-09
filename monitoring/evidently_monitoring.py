@@ -72,7 +72,7 @@ class Monitoring:
         self._workspace = Workspace.create(name)
         return self._workspace
     
-    def create_project(self, project_name:str, workspace: WorkspaceBase = None):
+    def search_or_create_project(self, project_name:str, workspace: WorkspaceBase = None):
         if(self._workspace is None):
             self._workspace = workspace
         project_list = self._workspace.search_project(project_name=project_name)

@@ -7,6 +7,7 @@ from House_price_prediction import *
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 import logging
+from monitoring.evidently_monitoring import *
 
 
 logging.basicConfig(   
@@ -22,40 +23,13 @@ logging.basicConfig(
 class MonitorDrift():
     def __init__(self):       
         self.house = HousePricePrediction()      
-        #self.features = None
+        self.monitoring = Monitoring(DataDriftReport())
         self.start_date = datetime.now() - timedelta(days=20)
-        self.end_date = datetime.now()
 
     def get_db_connection(self):
         connstr = 'postgresql+psycopg2://postgres:root@localhost:5432/feast_offline'
         engine = create_engine(connstr)
         return engine
-              
-    def push_feedback_to_db(self):
-        try:
-            engine = self.get_db_connection()
-            logging.info(engine)
-            house_feature = pd.read_sql("select house_id from public.house_features_sql", con=engine)
-            #self.features = self.house.get_historical_features(entity_df=entity_df)
-            last_id = house_feature.loc[house_feature["house_id"].idxmax()]["house_id"]
-            logging.info(last_id)
-            path = os.getcwd() + "/serving/feedback.csv"
-            logging.info(path)
-            #path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), "serving/feedback.csv")
-            data = pd.read_csv(path, parse_dates=["event_timestamp"])
-            logging.info(data.head())
-            df = data[data["event_timestamp"] > self.start_date ]
-            df["house_id"] = range(last_id+1, last_id + len(df)+1)
-            logging.info("new records: %s", df.shape)
-            df_X = df.drop("prediction", axis=1)
-            df_y = df[["event_timestamp","house_id"]]
-            self.house.save_df_to_postgres(df_X, df_y, 'append')
-            end_date = df.loc[df["event_timestamp"].idxmax()]["event_timestamp"]
-            self.house.materialize(start_date=self.start_date , end_date = self.end_date)
-            logging.info("Feedback data pushed to online feature store successfully!") 
-        except Exception as e:   
-            logging.error(e)
-        
             
     def get_reference_and_current_data(self):
         feature_list=[
@@ -72,17 +46,28 @@ class MonitorDrift():
         current = self.house.get_online_features(store, entity_df_cur)
         return reference, current
      
-    def monitor_drift(self, reference, current):
-        print(reference)
-        print(current)           
-        
+    def monitor_drift(self, reference=None, current=None):
+        if(reference is None or current is None):
+            reference, current = self.get_reference_and_current_data()
+        logging.info("reference:%s", reference)
+        logging.info("reference:%s", current)
+        ws = self.monitoring.create_workspace('house price monitoring')
+        project = self.monitoring.search_or_create_project("house price project", ws)
+        #Data drift report
+        print(self.monitoring.current_strategy)
+        drift = self.monitoring.execute_strategy(reference, current, ws)
+        #Data drfit test report
+        self.monitoring.set_strategy = DataDriftTestPreset()
+        test_suite = self.monitoring.execute_strategy(reference, current, ws)
+        # Check if drift is detected
+        drift_detected = any(test["status"] == "FAIL" for test in test_suite.as_dict()["tests"])
+        return drift_detected
 
 if __name__ == "__main__":
     os.chdir("/home/edwin/git/ML-IPython-notebooks/House price prediction - project/")
-    m = MonitorDrift()
-    m.push_feedback_to_db()
-    ref, cur = m.get_reference_and_current_data()
-    logging.info("reference:%s", ref)
-    logging.info("reference:%s", cur)
-    logging.info("Data pushed successfully")
-    print("Data pushed successfully")
+    drift_monitor = MonitorDrift()
+    refr, curr = drift_monitor.get_reference_and_current_data()
+    drift = drift_monitor.monitor_drift(refr, curr)
+    if drift:
+        logging.info("Data drift detected! Retraining required.")
+    logging.info("No drift detected!")

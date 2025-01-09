@@ -214,7 +214,7 @@ class HousePricePrediction():
     def model_monitoring(self, model:HouseModel, y_train_pred, y_pred):
         monitoring = Monitoring(DataDriftReport())
         ws = monitoring.create_workspace("house price monitoring")
-        project = monitoring.create_project("house price project", ws)
+        project = monitoring.search_or_create_project("house price project", ws)
         
 
         reference = model.x_train.copy()

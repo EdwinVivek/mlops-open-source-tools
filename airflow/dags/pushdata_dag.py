@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.python import PythonOperator
 from airflow import AirflowException
 from datetime import datetime, timedelta
 import subprocess
@@ -15,7 +15,7 @@ logging.basicConfig(
     force=True
 )
 
-def monitor_drift():
+def check_data_push():
     logging.info("enter method")
     # Command to activate the Conda environment and run the script
     #env_name = "base"
@@ -24,25 +24,17 @@ def monitor_drift():
     #result = subprocess.run(command, capture_output=True, shell=True)
 
     python_path = "/home/edwin/anaconda3/bin/python"
-    script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/monitor_drift.py"
+    script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/update_datastore.py"
 
     # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
     
-    if(result.stdout.endswith("Data drift detected! Retraining required")):
-        logging.info(result.stdout)
-        return "trigger_retrain"
+    if(result.stdout.endswith("Data pushed successfully\n")):
+        logging.info(result.stderr)
+        return "Push success"
     else:
         logging.info(result.stderr)
-        return "no_retrain"
-        #raise ValueError(result.stdout.decode())
-    
-def retrain_model():
-    python_path = "/home/edwin/anaconda3/bin/python"
-    script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/train_model.py"
-
-    # Run the command using a list
-    result = subprocess.run([python_path, script_path], capture_output=True, text=True)
+        raise ValueError(result.stdout.decode())
 
 # Define the DAG
 default_args = {
@@ -55,24 +47,14 @@ default_args = {
 }
 
 with DAG(
-    'check_drift and retrain',
+    'push_data',
     default_args=default_args,
-    description='DAG to check data drift and retrain if required',
+    description='A DAG to push data to feature store',
     schedule_interval=timedelta(minutes=5),
     start_date=datetime(2025, 1, 1),
     catchup=False,
 ) as dag:
-    check_drift_task = BranchPythonOperator(
-        task_id='check_data_drift',
-        python_callable=monitor_drift
+    check_drift_task = PythonOperator(
+        task_id='push feedback data',
+        python_callable=check_data_push
     )
-    retrain_task = PythonOperator(
-        task_id='trigger_retrain',
-        python_callable=retrain_model
-    )
-    no_retrain_task = DummyOperator(
-        task_id='no_retrain'
-    )
-
-
-check_drift_task >> [retrain_task, no_retrain_task]
