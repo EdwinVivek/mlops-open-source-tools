@@ -16,7 +16,7 @@ class TrainModel():
         self.house_model = HouseModel()
 
     def get_current_features(self):
-        connstr = 'postgresql+psycopg://postgres:Syncfusion%40123@localhost:5432/feast_offline'
+        connstr = 'postgresql+psycopg2://postgres:root@localhost:5432/feast_offline'
         engine = db.create_engine(connstr)
         Y_hist = pd.read_sql(str.format("select house_id, price from public.house_target_sql"), con=engine)
         store = self.house_main.get_feature_store()
@@ -52,7 +52,7 @@ class TrainModel():
         }
         model = LinearRegression(**self.params)
         model.fit(x, y)
-        with open("model\\house_regression_model.pkl", "wb") as f:
+        with open("model/house_regression_model.pkl", "wb") as f:
             pickle.dump(model, f)
         print("Model re-trained and saved as model.pkl")
 

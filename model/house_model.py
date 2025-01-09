@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 import pickle
 
 class HouseModel:
-    def __init__(self, features, target):
+    def __init__(self, features=None, target=None):
         self.features = features
         self.target = target
         self.x_train = None
@@ -23,7 +23,7 @@ class HouseModel:
         model.fit(self.x_train, self.y_train)
 
         # Save the trained model
-        with open("model\\house_regression_model.pkl", "wb") as f:
+        with open("model/house_regression_model.pkl", "wb") as f:
             pickle.dump(model, f)
         print("Model trained and saved as model.pkl")
 
@@ -31,7 +31,7 @@ class HouseModel:
     def load_model(self):
         #self.model = None
         # Load the saved model
-        with open("model\\house_regression_model.pkl", "rb") as f:
+        with open("model/house_regression_model.pkl", "rb") as f:
             model = pickle.load(f)
         return model
         

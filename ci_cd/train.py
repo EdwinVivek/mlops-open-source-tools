@@ -50,7 +50,7 @@ class TrainModel():
         }
         model = LinearRegression(**self.params)
         model.fit(x, y)
-        with open("model\\house_regression_model.pkl", "wb") as f:
+        with open("model/house_regression_model.pkl", "wb") as f:
             pickle.dump(model, f)
         print("Model re-trained and saved as model.pkl")
 
