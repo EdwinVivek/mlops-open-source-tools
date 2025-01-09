@@ -150,7 +150,7 @@ class HousePricePrediction():
         online_df = store.get_online_features(entity_rows, features) 
         return online_df
 
-    def materialize(self, end_date = datetime.datetime.now(), start_date=None, increment=False, store=None):
+    def materialize(self, end_date = datetime.now(), start_date=None, increment=False, store=None):
         if(store is None):
             store = self.get_feature_store()
         if not increment:

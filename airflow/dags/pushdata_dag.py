@@ -24,7 +24,7 @@ def check_data_push():
     #result = subprocess.run(command, capture_output=True, shell=True)
 
     python_path = "/home/edwin/anaconda3/bin/python"
-    script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/update_datastore.py"
+    script_path = "/home/edwin/git/mlops-open-source-tools/airflow/update_datastore.py"
 
     # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
@@ -47,7 +47,7 @@ default_args = {
 }
 
 with DAG(
-    'push_data',
+    'push_features',
     default_args=default_args,
     description='A DAG to push data to feature store',
     schedule_interval=timedelta(minutes=5),
@@ -55,6 +55,6 @@ with DAG(
     catchup=False,
 ) as dag:
     check_drift_task = PythonOperator(
-        task_id='push feedback data',
+        task_id='push_feedbac_data',
         python_callable=check_data_push
     )

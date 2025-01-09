@@ -59,7 +59,7 @@ class UpdateDataStore():
      
     
 if __name__ == "__main__":
-    os.chdir("/home/edwin/git/ML-IPython-notebooks/House price prediction - project/")
+    os.chdir("/home/edwin/git/mlops-open-source-tools/")
     uds = UpdateDataStore()
     uds.push_feedback_to_db()
     logging.info("Data pushed successfully")

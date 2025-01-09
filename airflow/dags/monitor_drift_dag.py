@@ -1,5 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.empty import EmptyOperator
 from airflow import AirflowException
 from datetime import datetime, timedelta
 import subprocess
@@ -24,22 +25,24 @@ def monitor_drift():
     #result = subprocess.run(command, capture_output=True, shell=True)
 
     python_path = "/home/edwin/anaconda3/bin/python"
-    script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/monitor_drift.py"
+    script_path = "/home/edwin/git/mlops-open-source-tools/airflow/monitor_drift.py"
 
     # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
     
-    if(result.stdout.endswith("Data drift detected! Retraining required")):
+    if(result.stdout.endswith("Data drift detected! Retraining required\n")):
+        logging.info("trigger_retrain")
         logging.info(result.stdout)
         return "trigger_retrain"
     else:
+        logging.info("no_retrain")
         logging.info(result.stderr)
         return "no_retrain"
         #raise ValueError(result.stdout.decode())
     
 def retrain_model():
     python_path = "/home/edwin/anaconda3/bin/python"
-    script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/train_model.py"
+    script_path = "/home/edwin/git/mlops-open-source-tools/airflow/train_model.py"
 
     # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
@@ -55,7 +58,7 @@ default_args = {
 }
 
 with DAG(
-    'check_drift and retrain',
+    'check_drift_and_retrain',
     default_args=default_args,
     description='DAG to check data drift and retrain if required',
     schedule_interval=timedelta(minutes=5),
@@ -70,7 +73,7 @@ with DAG(
         task_id='trigger_retrain',
         python_callable=retrain_model
     )
-    no_retrain_task = DummyOperator(
+    no_retrain_task = EmptyOperator(
         task_id='no_retrain'
     )
 

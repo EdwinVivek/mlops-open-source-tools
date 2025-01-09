@@ -8,12 +8,12 @@ from evidently.test_preset import DataStabilityTestPreset, NoTargetPerformanceTe
 from evidently.tests import TestNumberOfDriftedColumns
 from evidently.ui.workspace import Workspace
 from evidently.ui.workspace import WorkspaceBase, RemoteWorkspace
-from evidently.ui.dashboards import DashboardPanelCounter, DashboardPanelPlot, ReportFilter, PanelValue, PlotType, CounterAgg
+from evidently.ui.dashboards import DashboardPanelCounter, DashboardPanelPlot, ReportFilter, PanelValue, PlotType, CounterAgg, TestSuitePanelType, DashboardPanelTestSuite
 from evidently.renderers.html_widgets import WidgetSize
 
 from abc import ABC, abstractmethod
 import pandas as pd
-import datetime
+from datetime import datetime
 
 
 class GenerateReport(ABC):
@@ -23,7 +23,7 @@ class GenerateReport(ABC):
 
 class DataDriftReport(GenerateReport):
     def create_report(self, workspace, project, reference, current, column_mapping):
-        data_drift_report = Report(metrics=[DataDriftPreset()], timestamp=datetime.datetime.now())
+        data_drift_report = Report(metrics=[DataDriftPreset()], timestamp=datetime.now())
         data_drift_report.run(reference_data=reference, current_data=current)
         workspace.add_report(project_id=project.id, report=data_drift_report)
         return data_drift_report

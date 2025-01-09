@@ -9,6 +9,8 @@ from sqlalchemy import create_engine
 import logging
 from monitoring.evidently_monitoring import *
 
+WORKSPACE = 'monitoring workspace'
+PROJECT = 'monitoring project'
 
 logging.basicConfig(   
     filename="app.log",
@@ -51,23 +53,24 @@ class MonitorDrift():
             reference, current = self.get_reference_and_current_data()
         logging.info("reference:%s", reference)
         logging.info("reference:%s", current)
-        ws = self.monitoring.create_workspace('house price monitoring')
-        project = self.monitoring.search_or_create_project("house price project", ws)
+        ws = self.monitoring.create_workspace(WORKSPACE)
+        project = self.monitoring.search_or_create_project(PROJECT, ws)
         #Data drift report
         print(self.monitoring.current_strategy)
         drift = self.monitoring.execute_strategy(reference, current, ws)
         #Data drfit test report
-        self.monitoring.set_strategy = DataDriftTestPreset()
+        self.monitoring.set_strategy = DataDriftTestReport()
         test_suite = self.monitoring.execute_strategy(reference, current, ws)
         # Check if drift is detected
         drift_detected = any(test["status"] == "FAIL" for test in test_suite.as_dict()["tests"])
         return drift_detected
 
 if __name__ == "__main__":
-    os.chdir("/home/edwin/git/ML-IPython-notebooks/House price prediction - project/")
+    os.chdir("/home/edwin/git/mlops-open-source-tools/")
     drift_monitor = MonitorDrift()
     refr, curr = drift_monitor.get_reference_and_current_data()
     drift = drift_monitor.monitor_drift(refr, curr)
-    if drift:
+    if(drift):
         logging.info("Data drift detected! Retraining required.")
-    logging.info("No drift detected!")
+    else:
+        logging.info("No drift detected!")

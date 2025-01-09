@@ -1,0 +1,16 @@
+{
+  "id": "01944ca9-2210-7fd5-87fa-4c4a2d849d31",
+  "name": "monitoring project",
+  "description": null,
+  "dashboard": {
+    "name": "monitoring project",
+    "panels": [],
+    "tabs": [],
+    "tab_id_to_panel_ids": {}
+  },
+  "team_id": null,
+  "org_id": null,
+  "date_from": null,
+  "date_to": null,
+  "created_at": "2025-01-10T01:32:20.304435"
+}
