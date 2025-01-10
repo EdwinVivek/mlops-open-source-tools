@@ -1,5 +1,6 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.empty import EmptyOperator
 from airflow import AirflowException
 from datetime import datetime, timedelta
 import subprocess
@@ -25,16 +26,21 @@ def check_data_push():
 
     python_path = "/home/edwin/anaconda3/bin/python"
     script_path = "/home/edwin/git/mlops-open-source-tools/airflow/update_datastore.py"
-
-    # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
     
     if(result.stdout.endswith("Data pushed successfully\n")):
         logging.info(result.stderr)
-        return "Push success"
+        return "update_dashboard"
     else:
         logging.info(result.stderr)
-        raise ValueError(result.stdout.decode())
+        return "no_update"
+        #raise ValueError(result.stdout.decode())
+
+def update_live_dashboard():
+    python_path = "/home/edwin/anaconda3/bin/python"
+    script_path = "/home/edwin/git/mlops-open-source-tools/airflow/live_dashboard.py"
+    result = subprocess.run([python_path, script_path], capture_output=True, text=True)
+    
 
 # Define the DAG
 default_args = {
@@ -54,7 +60,14 @@ with DAG(
     start_date=datetime(2025, 1, 1),
     catchup=False,
 ) as dag:
-    check_drift_task = PythonOperator(
+    check_drift_task = BranchPythonOperator(
         task_id='push_feedbac_data',
         python_callable=check_data_push
+    )
+    update_dashboard_task = PythonOperator(
+        task_id="update_dashboard",
+        python_callable=update_live_dashboard
+    )
+    no_update_task = EmptyOperator(
+        task_id='no_update'
     )
