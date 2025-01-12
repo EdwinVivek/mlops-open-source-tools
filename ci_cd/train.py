@@ -5,13 +5,13 @@ import pandas as pd
 import pickle
 sys.path.append(os.getcwd())
 
-from House_price_prediction import *
+#from House_price_prediction import *
 from model.house_model import HouseModel
 
 
 class TrainModel():
     def __init__(self):
-        self.house_main = HousePricePrediction()
+        #self.house_main = HousePricePrediction()
         self.house_model = HouseModel()
 
     def get_current_features(self):
