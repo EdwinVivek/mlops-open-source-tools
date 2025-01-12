@@ -15,8 +15,8 @@ class TrainModel():
         self.house_model = HouseModel()
 
     def get_current_features(self):
-        features_path = "//feature_store//data//house_features.parquet"
-        target_path = "//feature_store//data//house_target.parquet"
+        features_path = "/feature_store/data/house_features.parquet"
+        target_path = "/feature_store/data/house_target.parquet"
         X_hist = pd.read_parquet(os.getcwd() + features_path, columns=["area", "mainroad", "bedrooms"])
         Y_hist = pd.read_parquet(os.getcwd() + target_path, columns=["price"])
         X_hist["price"] = Y_hist["price"]
