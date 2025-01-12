@@ -22,7 +22,6 @@ from mlflow.models import infer_signature
 from mlflow.sklearn import log_model, load_model
 from model.house_model import HouseModel
 
-import bentoml
 from serving.model_serving import BentoModel
 from bentoml import HTTPServer
 import numpy as np
@@ -315,7 +314,6 @@ class HousePricePrediction():
         #get bento mlflow model
         b_runner = bento_model.get_model(model_name)
         b_runner.predict.run(model.x_test[:1])
-
 
         #start the server from python
         server = HTTPServer("house_service:latest", production=True, port=3000, host='127.0.0.1')
