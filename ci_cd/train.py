@@ -5,13 +5,11 @@ import pandas as pd
 import pickle
 sys.path.append(os.getcwd())
 
-#from House_price_prediction import *
 from model.house_model import HouseModel
 
 
 class TrainModel():
     def __init__(self):
-        #self.house_main = HousePricePrediction()
         self.house_model = HouseModel()
 
     def get_current_features(self):
@@ -44,7 +42,6 @@ class TrainModel():
         #self.train_model(X_combined, y_combined)
         self.house_model.train_model(X_combined, y_combined, test_size=0.1)
         print("Model re-trained and saved as model.pkl")
-        logging.info("Model re-trained and saved as model.pkl")
 
     def train_model(self, x, y):
         self.params = {
