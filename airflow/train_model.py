@@ -61,7 +61,10 @@ class TrainModel():
         y_combined = combined_data["price"]
         print(combined_data)
         logging.info("combine data called")
-        self.train_model(X_combined, y_combined)
+        #self.train_model(X_combined, y_combined)
+        self.house_model.train_model(X_combined, y_combined, test_size=0.1)
+        print("Model re-trained and saved as model.pkl")
+        logging.info("Model re-trained and saved as model.pkl")
 
     def train_model(self, x, y):
         self.params = {
@@ -77,13 +80,17 @@ class TrainModel():
         print("Model re-trained and saved as model.pkl")
         logging.info("Model re-trained and saved as model.pkl")
 
-
+    def register(self):
+        self.house_model.mlflow_config()
+        self.house_model.register()
+        
 
 if __name__ == "__main__":
-    logging.info("enter train model")
     os.chdir("/home/edwin/git/mlops-open-source-tools/")
     t = TrainModel()
     X_hist = t.get_current_features()
     X_new = t.predict_new_data()
     t.create_and_train_new_dataset_with_target(X_hist, X_new)
+    t.register()
+    logging.info("Model trained and registered")
 

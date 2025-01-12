@@ -164,8 +164,8 @@ class HousePricePrediction():
     # <h2>MLFlow
     def experiment_tracking(self):
         features, target = self.execute_feauture_store()
-        model = HouseModel(features, target)
-        lreg_model = model.train_model()
+        model = HouseModel()
+        lreg_model = model.train_model(features, target)
 
         print(model.x_train.shape)
         print(model.x_test.shape)
@@ -178,8 +178,11 @@ class HousePricePrediction():
         y_pred = model.predict(model.x_test)
         test_metrics = model.metrics(y_pred)
         test_metrics
+        model_info = self.register_model(model)
+        self.model_monitoring(model, y_train_pred, y_pred)
+        self.model_serving(model, model_info)
 
-
+    def register_model(self, model:HouseModel):
         mlflow.get_experiment_by_name("House price prediction")
         mlflow.set_tracking_uri(uri="http://localhost:5000")
 
@@ -204,8 +207,7 @@ class HousePricePrediction():
                 input_example= model.x_train,
                 registered_model_name="house_price_prediction"
             )
-        self.model_monitoring(model, y_train_pred, y_pred)
-        self.model_serving(model, model_info)
+        return model_info
         
 
 
