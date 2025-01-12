@@ -1,0 +1,170 @@
+{
+  "check_interval": 1,
+  "collectors": {
+    "house_ev": {
+      "id": "house_ev",
+      "trigger": {
+        "type": "evidently:collector_trigger:IntervalTrigger",
+        "interval": 30.0,
+        "last_triggered": 1736654584.9754105
+      },
+      "report_config": {
+        "metrics": [
+          {
+            "type": "evidently:metric:DatasetDriftMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "stattest": null,
+            "cat_stattest": null,
+            "num_stattest": null,
+            "text_stattest": null,
+            "per_column_stattest": null,
+            "stattest_threshold": null,
+            "cat_stattest_threshold": null,
+            "num_stattest_threshold": null,
+            "text_stattest_threshold": null,
+            "per_column_stattest_threshold": null,
+            "columns": null,
+            "drift_share": 0.5
+          },
+          {
+            "type": "evidently:metric:DataDriftTable",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "stattest": null,
+            "cat_stattest": null,
+            "num_stattest": null,
+            "text_stattest": null,
+            "per_column_stattest": null,
+            "stattest_threshold": null,
+            "cat_stattest_threshold": null,
+            "num_stattest_threshold": null,
+            "text_stattest_threshold": null,
+            "per_column_stattest_threshold": null,
+            "columns": null,
+            "feature_importance": false
+          }
+        ],
+        "tests": [],
+        "options": {
+          "color": null,
+          "render": null,
+          "data_definition": null
+        },
+        "metadata": {
+          "metric_presets": [
+            "DataDriftPreset"
+          ]
+        },
+        "tags": []
+      },
+      "reference_path": "house_ev_reference.parquet",
+      "project_id": "019458ad-f4b1-7611-bd7d-92d4bcbf10df",
+      "api_url": "http://localhost:8000",
+      "api_secret": null,
+      "cache_reference": true,
+      "is_cloud": null,
+      "save_datasets": false
+    },
+    "house_ev_test": {
+      "id": "house_ev_test",
+      "trigger": {
+        "type": "evidently:collector_trigger:RowsCountTrigger",
+        "rows_count": 1
+      },
+      "report_config": {
+        "metrics": [],
+        "tests": [
+          {
+            "type": "evidently:test:TestNumberOfDriftedColumns",
+            "is_critical": true,
+            "feature_importance": false
+          },
+          {
+            "lt": 0.3,
+            "type": "evidently:test:TestShareOfDriftedColumns",
+            "is_critical": true,
+            "feature_importance": false
+          },
+          {
+            "type": "evidently:test:TestColumnDrift",
+            "is_critical": true,
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "mainroad",
+              "display_name": "mainroad",
+              "dataset": "main"
+            },
+            "stattest": null,
+            "stattest_threshold": null
+          },
+          {
+            "type": "evidently:test:TestColumnDrift",
+            "is_critical": true,
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "house_id",
+              "display_name": "house_id",
+              "dataset": "main"
+            },
+            "stattest": null,
+            "stattest_threshold": null
+          },
+          {
+            "type": "evidently:test:TestColumnDrift",
+            "is_critical": true,
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "area",
+              "display_name": "area",
+              "dataset": "main"
+            },
+            "stattest": null,
+            "stattest_threshold": null
+          },
+          {
+            "type": "evidently:test:TestColumnDrift",
+            "is_critical": true,
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "bedrooms",
+              "display_name": "bedrooms",
+              "dataset": "main"
+            },
+            "stattest": null,
+            "stattest_threshold": null
+          }
+        ],
+        "options": {
+          "color": null,
+          "render": null,
+          "data_definition": null
+        },
+        "metadata": {
+          "test_presets": [
+            "DataDriftTestPreset"
+          ]
+        },
+        "tags": []
+      },
+      "reference_path": "house_ev_test_reference.parquet",
+      "project_id": "019458ad-f4b1-7611-bd7d-92d4bcbf10df",
+      "api_url": "http://localhost:8000",
+      "api_secret": null,
+      "cache_reference": true,
+      "is_cloud": null,
+      "save_datasets": false
+    }
+  },
+  "storage": {
+    "type": "evidently:collector_storage:InMemoryStorage",
+    "max_log_events": 10
+  },
+  "autosave": true
+}

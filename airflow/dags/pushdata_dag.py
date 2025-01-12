@@ -71,3 +71,5 @@ with DAG(
     no_update_task = EmptyOperator(
         task_id='no_update'
     )
+
+check_drift_task >> [update_dashboard_task, no_update_task]

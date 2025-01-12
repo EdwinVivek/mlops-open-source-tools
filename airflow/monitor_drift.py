@@ -72,5 +72,7 @@ if __name__ == "__main__":
     drift = drift_monitor.monitor_drift(refr, curr)
     if(drift):
         logging.info("Data drift detected! Retraining required.")
+        print("Data drift detected! Retraining required.")
     else:
         logging.info("No drift detected!")
+        print("No drift detected!")

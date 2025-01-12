@@ -1,9 +1,12 @@
 import os
 import sys
 sys.path.append(os.getcwd())
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from sqlalchemy import create_engine
+import logging
 
+from House_price_prediction import *
 from monitoring.evidently_monitoring import *
-from airflow.monitor_drift import MonitorDrift
 
 from evidently.collector.config import ReportConfig
 from evidently.collector.client import CollectorClient
@@ -11,6 +14,16 @@ from evidently.collector.config import CollectorConfig
 from evidently.collector.config import IntervalTrigger
 from evidently.collector.config import ReportConfig
 from evidently.collector.config import RowsCountTrigger
+
+logging.basicConfig(   
+    filename="app.log",
+    encoding="utf-8",
+    filemode="a",
+    format="{asctime} - {levelname} - {message}",
+    style="{",
+    datefmt="%Y-%m-%d %H:%M",
+    force=True
+)
 
 WORKSPACE = "monitoring workspace"
 PROJECT = "live dashboard"
@@ -21,18 +34,39 @@ COLLECTOR_TEST_ID = "house_ev_test"
 class Dashboard():
     def __init__(self):
         self.monitoring = Monitoring(DataDriftReport())
-        self.drift_monitor = MonitorDrift()
+        self.house = HousePricePrediction()     
         self.client = CollectorClient("http://localhost:8001")
         self.ws = None
         self.reference = None
-
+        self.start_date = datetime.now() - timedelta(days=20)
+        
+    def get_db_connection(self):
+        connstr = 'postgresql+psycopg2://postgres:root@localhost:5432/feast_offline'
+        engine = create_engine(connstr)
+        return engine
+    
+    def get_reference_and_current_data(self):
+        feature_list=[
+            "house_features:area",
+            "house_features:bedrooms",
+            "house_features:mainroad"
+        ]
+        store = self.house.get_feature_store()
+        features = self.house.get_historical_features()
+        entity_df_ref = pd.DataFrame(features["house_id"])
+        reference = self.house.get_online_features(store, entity_df_ref)
+        engine = self.get_db_connection()
+        entity_df_cur = pd.read_sql(str.format("select house_id from public.house_features_sql where event_timestamp >= '{0}'", self.start_date.strftime(r'%Y-%m-%d %H:%M:%S')), con=engine)
+        current = self.house.get_online_features(store, entity_df_cur)
+        return reference, current
+     
     def get_project(self):
         self.ws = self.monitoring.create_workspace(WORKSPACE)
         project = self.monitoring.search_or_create_project(PROJECT)
         return project
 
     def create_reports(self):
-        self.reference, current = self.drift_monitor.get_reference_and_current_data()
+        self.reference, current = self.get_reference_and_current_data()
         
         #Data drift report
         print(self.monitoring.current_strategy)
@@ -111,17 +145,19 @@ class Dashboard():
         self.client.set_reference(id=COLLECTOR_TEST_ID, reference=self.reference)
 
     def send_data_to_collector(self):
-        _ , current = self.drift_monitor.get_reference_and_current_data()
+        _ , current = self.get_reference_and_current_data()
         self.client.send_data(COLLECTOR_ID, current)
         self.client.send_data(COLLECTOR_TEST_ID, current)
 
 if __name__ == "__main__":
+    os.chdir("/home/edwin/git/mlops-open-source-tools/")
     dashboard = Dashboard()
     if not os.path.exists(os.path.join(os.getcwd(), WORKSPACE)) or \
         len(Workspace.create(os.path.join(os.getcwd(), WORKSPACE)).search_project(PROJECT)) == 0:
         dashboard.configure_collector()
     dashboard.send_data_to_collector()
     print("Triggered monitoring")
+    logging.info("Triggered monitoring")
     #dashboard.client.send_data(COLLECTOR_ID, current)
     #dashboard.client.send_data(COLLECTOR_TEST_ID, current)
 

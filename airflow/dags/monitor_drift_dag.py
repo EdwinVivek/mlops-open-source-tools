@@ -18,6 +18,8 @@ logging.basicConfig(
 
 def monitor_drift():
     logging.info("enter method")
+    print("This is a debug message.")
+
     # Command to activate the Conda environment and run the script
     #env_name = "base"
     #script_path = "/home/edwin/git/ML-IPython-notebooks/House price prediction - project/airflow/monitor_drift.py"
@@ -29,10 +31,10 @@ def monitor_drift():
 
     # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
-    
-    if(result.stdout.endswith("Data drift detected! Retraining required\n")):
-        logging.info("trigger_retrain")
-        logging.info(result.stdout)
+
+    if(result.stdout.endswith("Data drift detected! Retraining required.\n")):
+        #logging.info("trigger_retrain")
+        #logging.info(result.stdout)
         return "trigger_retrain"
     else:
         logging.info("no_retrain")
@@ -46,6 +48,9 @@ def retrain_model():
 
     # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
+    logging.info(result.stdout)
+    logging.info(result.stderr)
+    return "trigger_retrain"
 
 # Define the DAG
 default_args = {

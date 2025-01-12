@@ -48,7 +48,8 @@ class UpdateDataStore():
             df["house_id"] = range(last_id+1, last_id + len(df)+1)
             logging.info("new records: %s", df.shape)
             df_X = df.drop("prediction", axis=1)
-            df_y = df[["event_timestamp","house_id"]]
+            #setting prediction as target for unseen data
+            df_y = df[["event_timestamp","house_id", "prediction"]].rename(columns={"prediction": "price"})
             self.house.save_df_to_postgres(df_X, df_y, 'append')
             end_date = df.loc[df["event_timestamp"].idxmax()]["event_timestamp"]
             self.house.materialize(start_date=self.start_date , end_date = self.end_date)
