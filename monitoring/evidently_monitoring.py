@@ -132,15 +132,39 @@ class Monitoring:
                         size=kwargs["size"]
                     )
                 )
+                
+            case "MultiPlot":
+                project.dashboard.add_panel(
+                    DashboardPanelPlot(
+                        title=kwargs["title"],
+                        filter=ReportFilter(metadata_values={}, tag_values=[]),
+                        values=[
+                            PanelValue(
+                                metric_id=kwargs["metric_id"],
+                                metric_args=kwargs["metric_args"],
+                                field_path=kwargs["field_path"],
+                                legend=kwargs["legend"]
+                            ),
+                            PanelValue(
+                                metric_id=kwargs["metric_id_2"],
+                                metric_args=kwargs["metric_args_2"],
+                                field_path=kwargs["field_path_2"],
+                                legend=kwargs["legend_2"]
+                            ),
+                        ],
+                        plot_type=kwargs["plot_type"],
+                        size=kwargs["size"]
+                    )
+                )
 
             case "TestSuite":
                 project.dashboard.add_panel(
                     DashboardPanelTestSuite(
                         title="All tests: detailed",
                         filter=ReportFilter(metadata_values={}, tag_values=[], include_test_suites=True),
-                        size=WidgetSize.HALF,
+                        size=WidgetSize.FULL,
                         panel_type=TestSuitePanelType.DETAILED,
-                        time_agg="1D",
+                        time_agg="1H",
                     )
                 )
 

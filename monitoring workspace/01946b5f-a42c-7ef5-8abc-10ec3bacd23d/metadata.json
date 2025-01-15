@@ -1,0 +1,138 @@
+{
+  "id": "01946b5f-a42c-7ef5-8abc-10ec3bacd23d",
+  "name": "live dashboard",
+  "description": null,
+  "dashboard": {
+    "name": "live dashboard",
+    "panels": [
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "01946b5f-b1fe-75f9-8014-5bb5bda560d4",
+        "title": "House price Monitoring dashboard",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 2,
+        "agg": "none",
+        "value": {
+          "field_path": "",
+          "metric_id": null,
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "01946b5f-b231-72a3-b136-1d9870fc6cbb",
+        "title": "Number of columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "number_of_columns",
+          "metric_id": "DatasetDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "01946b5f-b262-7738-9b9e-75e32c5e64d5",
+        "title": "Number of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "number_of_drifted_columns",
+          "metric_id": "DatasetDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "01946b5f-b290-7024-abbd-dd05118913f7",
+        "title": "Target column drift score",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "drift_score",
+          "metric_id": "ColumnDriftMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": ""
+        },
+        "text": ""
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelPlot",
+        "id": "01946b5f-b2c3-7ecc-8574-e71ec6f6bd12",
+        "title": "Share of drifted columns",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "values": [
+          {
+            "field_path": "share_of_drifted_columns",
+            "metric_id": "DatasetDriftMetric",
+            "metric_fingerprint": null,
+            "metric_args": {},
+            "legend": "share"
+          }
+        ],
+        "plot_type": "line"
+      },
+      {
+        "type": "evidently:dashboard_panel:DashboardPanelCounter",
+        "id": "01946b5f-b2ee-73f2-95cd-f8fdd358ec99",
+        "title": "Number of missing values - Current",
+        "filter": {
+          "metadata_values": {},
+          "tag_values": [],
+          "include_test_suites": false
+        },
+        "size": 1,
+        "agg": "last",
+        "value": {
+          "field_path": "current.number_of_missing_values",
+          "metric_id": "DatasetMissingValuesMetric",
+          "metric_fingerprint": null,
+          "metric_args": {},
+          "legend": "Current - missing values"
+        },
+        "text": ""
+      }
+    ],
+    "tabs": [],
+    "tab_id_to_panel_ids": {}
+  },
+  "team_id": null,
+  "org_id": null,
+  "date_from": null,
+  "date_to": null,
+  "created_at": "2025-01-16T00:40:17.644113"
+}

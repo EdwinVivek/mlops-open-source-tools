@@ -7,6 +7,7 @@ import logging
 
 from House_price_prediction import *
 from monitoring.evidently_monitoring import *
+from model.house_model import HouseModel
 
 from evidently.collector.config import ReportConfig
 from evidently.collector.client import CollectorClient
@@ -28,6 +29,8 @@ logging.basicConfig(
 WORKSPACE = "monitoring workspace"
 PROJECT = "live dashboard"
 COLLECTOR_ID = "house_ev"
+COLLECTOR_QUAL_ID = "house_ev_qual"
+COLLECTOR_TGT_ID = "house_ev_tgt"
 COLLECTOR_TEST_ID = "house_ev_test"
 
 
@@ -35,9 +38,11 @@ class Dashboard():
     def __init__(self):
         self.monitoring = Monitoring(DataDriftReport())
         self.house = HousePricePrediction()     
+        self.house_model = HouseModel()
         self.client = CollectorClient("http://localhost:8001")
         self.ws = None
         self.reference = None
+        self.column_mapping = ColumnMapping()
         self.start_date = datetime.now() - timedelta(days=20)
         
     def get_db_connection(self):
@@ -51,13 +56,33 @@ class Dashboard():
             "house_features:bedrooms",
             "house_features:mainroad"
         ]
+        logging.info("GEt data enter")
+
         store = self.house.get_feature_store()
         features = self.house.get_historical_features()
         entity_df_ref = pd.DataFrame(features["house_id"])
         reference = self.house.get_online_features(store, entity_df_ref)
         engine = self.get_db_connection()
-        entity_df_cur = pd.read_sql(str.format("select house_id from public.house_features_sql where event_timestamp >= '{0}'", self.start_date.strftime(r'%Y-%m-%d %H:%M:%S')), con=engine)
-        current = self.house.get_online_features(store, entity_df_cur)
+        entity_df_cur = pd.read_sql(str.format("select house_id, price from public.house_target_sql where event_timestamp >= '{0}'", self.start_date.strftime(r'%Y-%m-%d %H:%M:%S')), con=engine)
+        current = self.house.get_online_features(store, pd.DataFrame(entity_df_cur["house_id"]))
+        lr_model = self.house_model.load_model()        
+        
+        #Adding target and prediction to data
+        reference = reference.drop("house_id", axis=1)
+        reference = reference[lr_model.feature_names_in_]
+        reference["prediction"] = self.house_model.predict(reference)
+        reference["price"] = features["price"]
+        logging.info(reference)
+        
+        current = current.drop("house_id", axis=1)
+        current = current[lr_model.feature_names_in_]
+        current["prediction"] = self.house_model.predict(current)
+        current["price"] = entity_df_cur["price"]
+        logging.info(current)
+
+        self.column_mapping.target = "price"
+        self.column_mapping.prediction = "prediction"
+        
         return reference, current
      
     def get_project(self):
@@ -73,13 +98,25 @@ class Dashboard():
         drift_report = self.monitoring.execute_strategy(self.reference, current, self.ws)
         rep_config = ReportConfig.from_report(drift_report)
 
+        #Data quality report
+        self.monitoring.set_strategy = DataQualityReport()
+        qual_report = self.monitoring.execute_strategy(self.reference, current, self.ws)
+        qual_rep_config = ReportConfig.from_report(qual_report)
+        
+        #Target drift report
+        self.monitoring.set_strategy = TargetDriftReport()
+        target_report = self.monitoring.execute_strategy(self.reference, current, self.ws, self.column_mapping)
+        target_rep_config = ReportConfig.from_report(target_report)
+
 
         #Data drfit test report
         self.monitoring.set_strategy = DataDriftTestReport()
         print(self.monitoring.current_strategy)
         test_report = self.monitoring.execute_strategy(self.reference, current, self.ws)
         test_rep_config = ReportConfig.from_test_suite(test_report)
-        return rep_config, test_rep_config
+        
+        logging.info("All reports are created")
+        return rep_config, qual_rep_config, target_rep_config, test_rep_config
 
     def create_live_dashboard(self, project: evidently.ui.base.Project):
          #Create dashboard panels
@@ -97,16 +134,40 @@ class Dashboard():
 
         self.monitoring.add_dashboard_panel(
             project, panel_type="Counter", 
-            title = "Number of drifted columns",
+            title = "Number of columns",
             tags = [],  
             metric_id = "DatasetDriftMetric",
-            field_path = "Drifted Columns",
+            field_path = "number_of_columns",
             legend = "",
             text = "",
             agg = CounterAgg.LAST,
             size = WidgetSize.HALF
         )
 
+        self.monitoring.add_dashboard_panel(
+            project, panel_type="Counter", 
+            title = "Number of drifted columns",
+            tags = [],  
+            metric_id = "DatasetDriftMetric",
+            field_path = "number_of_drifted_columns",
+            legend = "",
+            text = "",
+            agg = CounterAgg.LAST,
+            size = WidgetSize.HALF
+        )
+        
+        self.monitoring.add_dashboard_panel(
+            project, panel_type="Counter", 
+            title = "Target column drift score",
+            tags = [],  
+            metric_id = "ColumnDriftMetric",
+            field_path = "drift_score",
+            legend = "",
+            text = "",
+            agg = CounterAgg.LAST,
+            size = WidgetSize.HALF
+        )
+        
         self.monitoring.add_dashboard_panel(
             project, panel_type="Plot", 
             title = "Share of drifted columns",
@@ -117,13 +178,27 @@ class Dashboard():
             legend = "share",
             plot_type = PlotType.LINE,
             size = WidgetSize.HALF,
-                agg = CounterAgg.SUM
+            agg = CounterAgg.SUM
         )
+        
+        self.monitoring.add_dashboard_panel(
+            project, panel_type="Counter", 
+            title = "Number of missing values - Current",
+            tags = [],  
+            metric_id = "DatasetMissingValuesMetric",
+            field_path = "current.number_of_missing_values",
+            metric_args = {},
+            legend = "Current - missing values",
+            size = WidgetSize.HALF,
+            agg = CounterAgg.LAST,
+            text = ""
+        )
+
 
     
     def configure_collector(self):
         project = self.get_project()
-        rep_config, test_rep_config = self.create_reports()
+        rep_config, qual_rep_config, target_rep_config, test_rep_config = self.create_reports()
         self.create_live_dashboard(project)
 
         conf = CollectorConfig(
@@ -133,6 +208,19 @@ class Dashboard():
         )
         self.client.create_collector(id=COLLECTOR_ID, collector=conf)
 
+        conf_qual = CollectorConfig(
+            trigger = IntervalTrigger(interval=30),
+            report_config = qual_rep_config,
+            project_id = str(project.id)
+        )
+        self.client.create_collector(id=COLLECTOR_QUAL_ID, collector=conf_qual)
+
+        conf_target = CollectorConfig(
+            trigger = IntervalTrigger(interval=30),
+            report_config = target_rep_config,
+            project_id = str(project.id)
+        )
+        self.client.create_collector(id=COLLECTOR_TGT_ID, collector=conf_target)
 
         test_conf = CollectorConfig(
             trigger=RowsCountTrigger(interval=30), 
@@ -142,11 +230,15 @@ class Dashboard():
         self.client.create_collector(id=COLLECTOR_TEST_ID, collector=test_conf)
         
         self.client.set_reference(id=COLLECTOR_ID, reference=self.reference)
+        self.client.set_reference(id=COLLECTOR_TGT_ID, reference=self.reference)
+        self.client.set_reference(id=COLLECTOR_QUAL_ID, reference=self.reference)
         self.client.set_reference(id=COLLECTOR_TEST_ID, reference=self.reference)
 
     def send_data_to_collector(self):
         _ , current = self.get_reference_and_current_data()
         self.client.send_data(COLLECTOR_ID, current)
+        self.client.send_data(COLLECTOR_TGT_ID, current)
+        self.client.send_data(COLLECTOR_QUAL_ID, current)
         self.client.send_data(COLLECTOR_TEST_ID, current)
 
 if __name__ == "__main__":

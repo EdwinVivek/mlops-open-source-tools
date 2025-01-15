@@ -1,12 +1,12 @@
 {
-  "check_interval": 1,
+  "check_interval": 1.0,
   "collectors": {
     "house_ev": {
       "id": "house_ev",
       "trigger": {
         "type": "evidently:collector_trigger:IntervalTrigger",
         "interval": 30.0,
-        "last_triggered": 1736654584.9754105
+        "last_triggered": 1736968221.7272518
       },
       "report_config": {
         "metrics": [
@@ -65,7 +65,7 @@
         "tags": []
       },
       "reference_path": "house_ev_reference.parquet",
-      "project_id": "019458ad-f4b1-7611-bd7d-92d4bcbf10df",
+      "project_id": "01946b5f-a42c-7ef5-8abc-10ec3bacd23d",
       "api_url": "http://localhost:8000",
       "api_secret": null,
       "cache_reference": true,
@@ -97,6 +97,18 @@
             "is_critical": true,
             "column_name": {
               "type": "evidently:base:ColumnName",
+              "name": "prediction",
+              "display_name": "prediction",
+              "dataset": "main"
+            },
+            "stattest": null,
+            "stattest_threshold": null
+          },
+          {
+            "type": "evidently:test:TestColumnDrift",
+            "is_critical": true,
+            "column_name": {
+              "type": "evidently:base:ColumnName",
               "name": "mainroad",
               "display_name": "mainroad",
               "dataset": "main"
@@ -109,8 +121,8 @@
             "is_critical": true,
             "column_name": {
               "type": "evidently:base:ColumnName",
-              "name": "house_id",
-              "display_name": "house_id",
+              "name": "price",
+              "display_name": "price",
               "dataset": "main"
             },
             "stattest": null,
@@ -154,7 +166,241 @@
         "tags": []
       },
       "reference_path": "house_ev_test_reference.parquet",
-      "project_id": "019458ad-f4b1-7611-bd7d-92d4bcbf10df",
+      "project_id": "01946b5f-a42c-7ef5-8abc-10ec3bacd23d",
+      "api_url": "http://localhost:8000",
+      "api_secret": null,
+      "cache_reference": true,
+      "is_cloud": null,
+      "save_datasets": false
+    },
+    "house_ev_qual": {
+      "id": "house_ev_qual",
+      "trigger": {
+        "type": "evidently:collector_trigger:IntervalTrigger",
+        "interval": 30.0,
+        "last_triggered": 1736968221.7300403
+      },
+      "report_config": {
+        "metrics": [
+          {
+            "type": "evidently:metric:DatasetSummaryMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "almost_duplicated_threshold": 0.95,
+            "almost_constant_threshold": 0.95
+          },
+          {
+            "type": "evidently:metric:ColumnSummaryMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "prediction",
+              "display_name": "prediction",
+              "dataset": "main"
+            }
+          },
+          {
+            "type": "evidently:metric:ColumnSummaryMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "price",
+              "display_name": "price",
+              "dataset": "main"
+            }
+          },
+          {
+            "type": "evidently:metric:ColumnSummaryMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "area",
+              "display_name": "area",
+              "dataset": "main"
+            }
+          },
+          {
+            "type": "evidently:metric:ColumnSummaryMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "bedrooms",
+              "display_name": "bedrooms",
+              "dataset": "main"
+            }
+          },
+          {
+            "type": "evidently:metric:ColumnSummaryMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "mainroad",
+              "display_name": "mainroad",
+              "dataset": "main"
+            }
+          },
+          {
+            "type": "evidently:metric:DatasetMissingValuesMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "missing_values": [
+              "",
+              -Infinity,
+              null,
+              Infinity
+            ]
+          }
+        ],
+        "tests": [],
+        "options": {
+          "color": null,
+          "render": null,
+          "data_definition": null
+        },
+        "metadata": {
+          "metric_presets": [
+            "DataQualityPreset"
+          ]
+        },
+        "tags": []
+      },
+      "reference_path": "house_ev_qual_reference.parquet",
+      "project_id": "01946b5f-a42c-7ef5-8abc-10ec3bacd23d",
+      "api_url": "http://localhost:8000",
+      "api_secret": null,
+      "cache_reference": true,
+      "is_cloud": null,
+      "save_datasets": false
+    },
+    "house_ev_tgt": {
+      "id": "house_ev_tgt",
+      "trigger": {
+        "type": "evidently:collector_trigger:IntervalTrigger",
+        "interval": 30.0,
+        "last_triggered": 1736968221.7314746
+      },
+      "report_config": {
+        "metrics": [
+          {
+            "type": "evidently:metric:ColumnDriftMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "price",
+              "display_name": "price",
+              "dataset": "main"
+            },
+            "stattest": null,
+            "stattest_threshold": null
+          },
+          {
+            "type": "evidently:metric:ColumnValuePlot",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": "price"
+          },
+          {
+            "type": "evidently:metric:ColumnCorrelationsMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "price",
+              "display_name": "price",
+              "dataset": "main"
+            }
+          },
+          {
+            "type": "evidently:metric:ColumnDriftMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "prediction",
+              "display_name": "prediction",
+              "dataset": "main"
+            },
+            "stattest": null,
+            "stattest_threshold": null
+          },
+          {
+            "type": "evidently:metric:ColumnCorrelationsMetric",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "column_name": {
+              "type": "evidently:base:ColumnName",
+              "name": "prediction",
+              "display_name": "prediction",
+              "dataset": "main"
+            }
+          },
+          {
+            "type": "evidently:metric:TargetByFeaturesTable",
+            "options": {
+              "color": null,
+              "render": null,
+              "data_definition": null
+            },
+            "columns": null
+          }
+        ],
+        "tests": [],
+        "options": {
+          "color": null,
+          "render": null,
+          "data_definition": null
+        },
+        "metadata": {
+          "metric_presets": [
+            "TargetDriftPreset"
+          ]
+        },
+        "tags": []
+      },
+      "reference_path": "house_ev_tgt_reference.parquet",
+      "project_id": "01946b5f-a42c-7ef5-8abc-10ec3bacd23d",
       "api_url": "http://localhost:8000",
       "api_secret": null,
       "cache_reference": true,
