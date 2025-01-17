@@ -43,6 +43,7 @@ class Dashboard():
         self.client = CollectorClient("http://localhost:8001")
         self.ws = None
         self.reference = None
+        self.column_mapping = ColumnMapping()
         self.start_date = datetime.now() - timedelta(days=20)
         
     def get_db_connection(self):
@@ -89,9 +90,9 @@ class Dashboard():
 
     def create_reports(self):
         self.reference, current = self.get_reference_and_current_data()
-        column_mapping = ColumnMapping()
-        column_mapping.target = "price"
-        column_mapping.prediction = "prediction"
+        self.column_mapping = ColumnMapping()
+        self.column_mapping.target = "price"
+        self.column_mapping.prediction = "prediction"
         #Data drift report
         print(self.monitoring.current_strategy)
         drift_report = self.monitoring.execute_strategy(self.reference, current, self.ws)
@@ -104,11 +105,11 @@ class Dashboard():
         
         #Target drift report
         self.monitoring.set_strategy = TargetDriftReport()
-        target_report = self.monitoring.execute_strategy(self.reference, current, self.ws, column_mapping)
+        target_report = self.monitoring.execute_strategy(self.reference, current, self.ws)
         target_rep_config = ReportConfig.from_report(target_report)
 
         self.monitoring.set_strategy = RegressionReport()
-        reg_report = self.monitoring.execute_strategy(self.reference, current, self.ws, column_mapping)    
+        reg_report = self.monitoring.execute_strategy(self.reference, current, self.ws, self.column_mapping)    
         reg_rep_config = ReportConfig.from_report(reg_report)
 
 
@@ -172,19 +173,6 @@ class Dashboard():
         )
         
         self.monitoring.add_dashboard_panel(
-            project, panel_type="Plot", 
-            title = "Share of drifted columns",
-            tags = [],  
-            metric_id = "DatasetDriftMetric",
-            field_path = "share_of_drifted_columns",
-            metric_args = {},
-            legend = "share",
-            plot_type = PlotType.LINE,
-            size = WidgetSize.HALF,
-            agg = CounterAgg.SUM
-        )
-        
-        self.monitoring.add_dashboard_panel(
             project, panel_type="Counter", 
             title = "Number of missing values - Current",
             tags = [],  
@@ -195,6 +183,19 @@ class Dashboard():
             size = WidgetSize.HALF,
             agg = CounterAgg.LAST,
             text = ""
+        )
+
+        self.monitoring.add_dashboard_panel(
+            project, panel_type="Plot", 
+            title = "Share of drifted columns",
+            tags = [],  
+            metric_id = "DatasetDriftMetric",
+            field_path = "share_of_drifted_columns",
+            metric_args = {},
+            legend = "share",
+            plot_type = PlotType.LINE,
+            size = WidgetSize.HALF,
+            agg = CounterAgg.SUM
         )
 
         self.monitoring.add_dashboard_panel(
@@ -279,8 +280,7 @@ class Dashboard():
         self.client.set_reference(id=COLLECTOR_TEST_ID, reference=self.reference)
 
     def send_data_to_collector(self):
-        _ , current = self.get_reference_and_current_data()
-        logging.info(current.iloc[0,:])
+        self.reference , current = self.get_reference_and_current_data()
         self.client.send_data(COLLECTOR_ID, current)
         self.client.send_data(COLLECTOR_TGT_ID, current)
         self.client.send_data(COLLECTOR_REG_ID, current)
