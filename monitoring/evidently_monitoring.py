@@ -23,28 +23,28 @@ class GenerateReport(ABC):
 
 class DataDriftReport(GenerateReport):
     def create_report(self, workspace, project, reference, current, column_mapping):
-        data_drift_report = Report(metrics=[DataDriftPreset()], timestamp=datetime.now())
+        data_drift_report = Report(metrics=[DataDriftPreset()], timestamp=datetime.now(), tags=["drift_rep"])
         data_drift_report.run(reference_data=reference, current_data=current)
         workspace.add_report(project_id=project.id, report=data_drift_report)
         return data_drift_report
 
 class TargetDriftReport(GenerateReport):
     def create_report(self, workspace, project, reference, current, column_mapping):
-        target_drift_report = Report(metrics=[TargetDriftPreset()])
+        target_drift_report = Report(metrics=[TargetDriftPreset()], tags=["targetdrift_rep"])
         target_drift_report.run(reference_data=reference, current_data=current, column_mapping = column_mapping)
         workspace.add_report(project_id=project.id, report=target_drift_report)
         return target_drift_report
 
 class DataQualityReport(GenerateReport):
     def create_report(self, workspace, project, reference, current, column_mapping):
-        data_quality_report = Report(metrics=[DataQualityPreset()])
+        data_quality_report = Report(metrics=[DataQualityPreset()], tags=["quality_rep"])
         data_quality_report.run(reference_data=reference, current_data=current)
         workspace.add_report(project_id=project.id, report=data_quality_report)
         return data_quality_report
 
 class RegressionReport(GenerateReport):
     def create_report(self, workspace, project, reference, current, column_mapping):
-        regression_performance_report = Report(metrics=[RegressionPreset()])
+        regression_performance_report = Report(metrics=[RegressionPreset()], tags=["regression_rep"])
         regression_performance_report.run(reference_data=reference, current_data=current, column_mapping = column_mapping)
         workspace.add_report(project_id=project.id, report=regression_performance_report)
         return regression_performance_report
