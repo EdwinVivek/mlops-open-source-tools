@@ -37,8 +37,6 @@ def monitor_drift():
         #logging.info(result.stdout)
         return "trigger_retrain"
     else:
-        logging.info("no_retrain")
-        logging.info(result.stderr)
         return "no_retrain"
         #raise ValueError(result.stdout.decode())
     
@@ -48,9 +46,13 @@ def retrain_model():
 
     # Run the command using a list
     result = subprocess.run([python_path, script_path], capture_output=True, text=True)
-    logging.info(result.stdout)
-    logging.info(result.stderr)
     return "trigger_retrain"
+
+def deploy_model():
+    script_path = "/home/edwin/git/mlops-open-source-tools/serving/service.py"
+    # Serve the BentoML service with reload
+    subprocess.run(["bentoml", "serve", script_path, "--reload"])
+    
 
 # Define the DAG
 default_args = {
@@ -81,6 +83,11 @@ with DAG(
     no_retrain_task = EmptyOperator(
         task_id='no_retrain'
     )
+    deploy_model_task = PythonOperator(
+        task_id='deploy_model',
+        python_callable=deploy_model
+    )
 
 
 check_drift_task >> [retrain_task, no_retrain_task]
+retrain_task >> deploy_model_task

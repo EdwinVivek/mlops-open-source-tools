@@ -41,6 +41,7 @@ class HouseService:
             start=pd.Timestamp.now(),  
             periods=1,  
             freq=None).to_frame(name="event_timestamp", index=False) 
+        
         with open('feedback.csv', 'a', newline='') as file: 
             writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC) 
             val = starmap(lambda x,y,z:[x,y,z], np.asarray(input_data).tolist()) 

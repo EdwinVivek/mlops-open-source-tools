@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from House_price_prediction import *
 from model.house_model import HouseModel
+from serving.model_serving import BentoModel
 
 logging.basicConfig(   
     filename="app.log",
@@ -80,10 +81,15 @@ class TrainModel():
         print("Model re-trained and saved as model.pkl")
         logging.info("Model re-trained and saved as model.pkl")
 
-    def register(self):
+    def register_model(self):
         self.house_model.mlflow_config()
-        self.house_model.register()
-        
+        model_info = self.house_model.register()
+        return model_info
+    
+    def serve_model(self, model_info):
+        bento_model = BentoModel()
+        model_name = bento_model.import_model("house_price_model", model_info.model_uri)
+        logging.info(str.format('Imported model {0} to BentoML', model_name))
 
 if __name__ == "__main__":
     os.chdir("/home/edwin/git/mlops-open-source-tools/")
@@ -91,6 +97,7 @@ if __name__ == "__main__":
     X_hist = t.get_current_features()
     X_new = t.predict_new_data()
     t.create_and_train_new_dataset_with_target(X_hist, X_new)
-    t.register()
+    m_info = t.register_model()
+    t.serve_model(m_info)
     logging.info("Model trained and registered")
 

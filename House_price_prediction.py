@@ -23,7 +23,7 @@ from mlflow.sklearn import log_model, load_model
 from model.house_model import HouseModel
 
 from serving.model_serving import BentoModel
-from bentoml import HTTPServer
+from bentoml import HTTPServer, SyncHTTPClient
 import numpy as np
 
 from monitoring.evidently_monitoring import *
@@ -302,7 +302,8 @@ class HousePricePrediction():
 
 
         # <h2>BentoML
-    def model_serving(self, model, model_info):
+    
+    def model_serving(self, model:HouseModel, model_info):
         bento_model = BentoModel()
         model_name= bento_model.import_model("house_price_model", model_info.model_uri)
         model_name
