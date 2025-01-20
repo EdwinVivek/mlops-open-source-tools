@@ -1,6 +1,6 @@
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, make_scorer, r2_score
+from sklearn.model_selection import train_test_split, GridSearchCV
 import numpy as np
 import pickle
 import mlflow
@@ -18,18 +18,32 @@ class HouseModel:
         self.y_test = None
         self.params = None
 
+    # Custom scorer for MSE
+    def mse_scorer(y_true, y_pred):
+        return mean_squared_error(y_true, y_pred)
+    
     def train_model(self, features, target, test_size=0.25):
         self.params = {
-            "fit_intercept": True,
-            "positive": False
+            "fit_intercept": [True, False],
+            "positive": [True,False]
         }
-        model = LinearRegression(**self.params)
+        model = LinearRegression()
+
+        # Set up GridSearchCV
+        grid_search = GridSearchCV(
+            estimator=model,
+            param_grid=self.params,
+            scoring=make_scorer(self.mse_scorer, greater_is_better=False),  # Negative MSE
+            cv=5,
+            return_train_score=True
+        )
+
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(features, target, test_size=test_size)
-        model.fit(self.x_train, self.y_train)
+        grid_search.fit(self.x_train, self.y_train)
 
         # Save the trained model
         with open("model/house_regression_model.pkl", "wb") as f:
-            pickle.dump(model, f)
+            pickle.dump(grid_search.best_estimator_, f)
         print("Model trained and saved as model.pkl")
 
     # Load model 
