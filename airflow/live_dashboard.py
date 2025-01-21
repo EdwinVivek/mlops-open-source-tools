@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sqlalchemy import create_engine
 import logging
 
-from House_price_prediction import *
+from feature_store.exec_feature_store import ExecuteFeatureStore
 from monitoring.evidently_monitoring import *
 from model.house_model import HouseModel
 
@@ -38,7 +38,7 @@ COLLECTOR_TEST_ID = "house_ev_test"
 class Dashboard():
     def __init__(self):
         self.monitoring = Monitoring(DataDriftReport())
-        self.house = HousePricePrediction()     
+        self.f_store = ExecuteFeatureStore()     
         self.house_model = HouseModel()
         self.client = CollectorClient("http://localhost:8001")
         self.ws = None
@@ -52,20 +52,13 @@ class Dashboard():
         return engine
     
     def get_reference_and_current_data(self):
-        feature_list=[
-            "house_features:area",
-            "house_features:bedrooms",
-            "house_features:mainroad"
-        ]
-        logging.info("GEt data enter")
-
-        store = self.house.get_feature_store()
-        features = self.house.get_historical_features()
+        store = self.f_store.get_feature_store()
+        features = self.f_store.get_historical_features()
         entity_df_ref = pd.DataFrame(features["house_id"])
-        reference = self.house.get_online_features(store, entity_df_ref)
+        reference = self.f_store.get_online_features(store, entity_df_ref)
         engine = self.get_db_connection()
         entity_df_cur = pd.read_sql(str.format("select house_id, price from public.house_target_sql where event_timestamp >= '{0}'", self.start_date.strftime(r'%Y-%m-%d %H:%M:%S')), con=engine)
-        current = self.house.get_online_features(store, pd.DataFrame(entity_df_cur["house_id"]))
+        current = self.f_store.get_online_features(store, pd.DataFrame(entity_df_cur["house_id"]))
         lr_model = self.house_model.load_model()        
         
         #Adding target and prediction to data

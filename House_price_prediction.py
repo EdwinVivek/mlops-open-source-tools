@@ -7,11 +7,11 @@ import pandas as pd
 import numpy as np
 import sqlalchemy as db
 
-from data_ingestor import *
-from basic_data_inspection import DataInspector, DataTypeInspection, SummaryDataInspection
-from univariate_analysis import UnivariateContext, NumericalUnivariateAnalysis, CategoricalUnivariateAnalysis
-from missing_value_handling import *
-from data_encoding import DataEncoding
+from eda.data_ingestor import *
+from eda.data_inspection import DataInspector, DataTypeInspection, SummaryDataInspection
+from eda.data_analysis import AnalysisContext, NumericalUnivariateAnalysis, CategoricalUnivariateAnalysis, BivariateHeatmapAnalysis
+from eda.missing_value_handling import *
+from eda.data_encoding import DataEncoding
 
 from feast import FeatureStore
 from feature_store.feature_store import FeastFeatureStore
@@ -24,7 +24,6 @@ from model.house_model import HouseModel
 
 from serving.model_serving import BentoModel
 from bentoml import HTTPServer, SyncHTTPClient
-import numpy as np
 
 from monitoring.evidently_monitoring import *
 from evidently.ui.dashboards import CounterAgg, PlotType
@@ -48,10 +47,10 @@ class HousePricePrediction():
         data_inspector.set_strategy(SummaryDataInspection())
         data_inspector.execute_strategy(self.df)
 
-        univariate = UnivariateContext(NumericalUnivariateAnalysis)
+        univariate = AnalysisContext(NumericalUnivariateAnalysis)
         univariate.analyzestrategy(self.df, "price")
 
-        univariate_cat = UnivariateContext(CategoricalUnivariateAnalysis)
+        univariate_cat = AnalysisContext(CategoricalUnivariateAnalysis)
         univariate_cat.analyzestrategy(self.df, "guestroom")
 
     def process_data(self) -> pd.DataFrame:

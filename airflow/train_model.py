@@ -9,7 +9,7 @@ sys.path.append(os.getcwd())
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-from House_price_prediction import *
+from feature_store.exec_feature_store import ExecuteFeatureStore
 from model.house_model import HouseModel
 from serving.model_serving import BentoModel
 
@@ -26,7 +26,7 @@ logging.basicConfig(
 
 class TrainModel():
     def __init__(self):
-        self.house_main = HousePricePrediction()
+        self.f_store = ExecuteFeatureStore()
         self.house_model = HouseModel()
 
     def get_current_features(self):
@@ -34,9 +34,9 @@ class TrainModel():
         engine = db.create_engine(connstr)
         logging.info("engine init")
         Y_hist = pd.read_sql(str.format("select house_id, price from public.house_target_sql"), con=engine)
-        store = self.house_main.get_feature_store()
+        store = self.f_store.get_feature_store()
         logging.info("store init")
-        X_hist = self.house_main.get_online_features(store, pd.DataFrame(Y_hist["house_id"]))
+        X_hist = self.f_store.get_online_features(store, pd.DataFrame(Y_hist["house_id"]))
         X_hist["price"] = Y_hist["price"]
         return X_hist
 

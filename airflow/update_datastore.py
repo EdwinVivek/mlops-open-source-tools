@@ -3,10 +3,11 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import pandas as pd
-from House_price_prediction import *
+from feature_store.exec_feature_store import ExecuteFeatureStore
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 import logging
+from feast.data_source import PushMode
 
 
 logging.basicConfig(   
@@ -21,13 +22,13 @@ logging.basicConfig(
 
 class UpdateDataStore():
     def __init__(self):       
-        self.house = HousePricePrediction()      
+        self.f_store = ExecuteFeatureStore()      
         #self.features = None
         self.start_date = datetime.now() - timedelta(days=20)
         self.end_date = datetime.now()
 
     def get_db_connection(self):
-        connstr = 'postgresql+psycopg2://postgres:root@localhost:5432/feast_offline'
+        connstr = 'postgresql+psycopg2://postgres:Syncfusion%40123@localhost:5432/feast_offline'
         engine = create_engine(connstr)
         return engine
               
@@ -40,7 +41,6 @@ class UpdateDataStore():
             last_id = house_feature.loc[house_feature["house_id"].idxmax()]["house_id"]
             logging.info(last_id)
             path = os.getcwd() + "/serving/feedback.csv"
-            logging.info(path)
             #path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), "serving/feedback.csv")
             data = pd.read_csv(path, parse_dates=["event_timestamp"])
             logging.info(data.head())
@@ -50,9 +50,21 @@ class UpdateDataStore():
             df_X = df.drop("prediction", axis=1)
             #setting prediction as target for unseen data
             df_y = df[["event_timestamp","house_id", "prediction"]].rename(columns={"prediction": "price"})
-            self.house.save_df_to_postgres(df_X, df_y, 'append')
+            self.f_store.save_df_to_postgres(df_X, df_y, 'append')
+            
+            '''expected_columns = ['house_id', 'event_timestamp', 'bedrooms', 'area', 'mainroad',
+                    'basement', 'airconditioning', 'parking', 'prefarea', 
+                    'bathrooms', 'stories', 'guestroom', 'furnishingstatus', 'hotwaterheating']
+            for col in expected_columns:
+                if col not in df_X.columns:
+                    df_X[col] = np.nan  # Add missing columns with NaN values
+            print(df_X)
+
+            f_store = ExecuteFeatureStore()
+            f_store.push_feedback(name="push_feedback", data=df_X)'''
+
             end_date = df.loc[df["event_timestamp"].idxmax()]["event_timestamp"]
-            self.house.materialize(start_date=self.start_date , end_date = self.end_date)
+            self.f_store.materialize(start_date=self.start_date , end_date = self.end_date)
             logging.info("Feedback data pushed to online feature store successfully!") 
         except Exception as e:   
             logging.error(e)

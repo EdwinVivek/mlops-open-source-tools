@@ -1,6 +1,6 @@
-from feast import Entity, Feature, FeatureView, ValueType, Field, FileSource
+from feast import Entity, Feature, FeatureView, ValueType, Field, FileSource, PushSource
 from feast.infra.offline_stores.contrib.postgres_offline_store.postgres_source import PostgreSQLSource
-from feast.types import Float32, Int64
+from feast.types import Float32, Int64, UnixTimestamp
 from datetime import timedelta
 
 
@@ -17,6 +17,14 @@ pg_source = PostgreSQLSource(
     query="SELECT * FROM house_features_sql",
     timestamp_field="event_timestamp",
     #created_timestamp_column="event_time"
+)
+
+push_source = PushSource(
+    name="push_feedback",
+    batch_source=PostgreSQLSource(
+        table="public.house_features_sql",
+        timestamp_field="event_timestamp"
+    )
 )
 
 # Define a Feature View
@@ -40,4 +48,28 @@ house_features = FeatureView(
     ],
     online=True,  # Indicates that the feature view is accessible in the online store
     source= pg_source,  # We'll load data programmatically
+)
+
+# Define a Feature View
+house_features_push = FeatureView(
+    name="house_features_push",
+    entities=[house],
+    ttl=timedelta(seconds=86400 * 10),  # Time-to-live for the features
+    schema=[
+        Field(name="area", dtype=Float32),
+        Field(name="bedrooms", dtype=Float32),
+        Field(name="bathrooms", dtype=Float32),
+        Field(name="stories", dtype=Float32),
+        Field(name="mainroad", dtype=Int64),
+        Field(name="guestroom", dtype=Int64),
+        Field(name="basement", dtype=Int64),
+        Field(name="hotwaterheating", dtype=Int64),
+        Field(name="airconditioning", dtype=Int64),
+        Field(name="parking", dtype=Float32),
+        Field(name="prefarea", dtype=Int64),
+        Field(name="furnishingstatus", dtype=Int64),
+        Field(name="house_id", dtype=Int64),
+        #Field(name="event_timestamp", dtype=UnixTimestamp),
+    ],
+    source= push_source,  # We'll load data programmatically
 )

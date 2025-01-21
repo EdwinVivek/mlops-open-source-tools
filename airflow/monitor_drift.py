@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import pandas as pd
-from House_price_prediction import *
+from feature_store.exec_feature_store import ExecuteFeatureStore
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 import logging
@@ -24,7 +24,7 @@ logging.basicConfig(
 
 class MonitorDrift():
     def __init__(self):       
-        self.house = HousePricePrediction()      
+        self.f_store = ExecuteFeatureStore()      
         self.monitoring = Monitoring(DataDriftReport())
         self.start_date = datetime.now() - timedelta(days=20)
 
@@ -34,18 +34,13 @@ class MonitorDrift():
         return engine
             
     def get_reference_and_current_data(self):
-        feature_list=[
-            "house_features:area",
-            "house_features:bedrooms",
-            "house_features:mainroad"
-        ]
-        store = self.house.get_feature_store()
-        features = self.house.get_historical_features()
+        store = self.f_store.get_feature_store()
+        features = self.f_store.get_historical_features()
         entity_df_ref = pd.DataFrame(features["house_id"])
-        reference = self.house.get_online_features(store, entity_df_ref)
+        reference = self.f_store.get_online_features(store, entity_df_ref)
         engine = self.get_db_connection()
         entity_df_cur = pd.read_sql(str.format("select house_id from public.house_features_sql where event_timestamp >= '{0}'", self.start_date.strftime(r'%Y-%m-%d %H:%M:%S')), con=engine)
-        current = self.house.get_online_features(store, entity_df_cur)
+        current = self.f_store.get_online_features(store, entity_df_cur)
         return reference, current
      
     def monitor_drift(self, reference=None, current=None):
