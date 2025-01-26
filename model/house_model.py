@@ -81,11 +81,11 @@ class HouseModel:
             exp_id = mlflow.create_experiment(name =EXPERIMENT_NAME)
             mlflow.set_experiment(experiment_id=exp_id)
         finally:
-            return mlflow.get_experiment_by_name("House price prediction")
+            return mlflow.get_experiment_by_name(EXPERIMENT_NAME)
 
     def log_gridsearch(self):
         for i, params in enumerate(self.grid_search.cv_results_["params"]):
-            with mlflow.start_run(run_name="child_run" + i, nested=True):  # Use nested=True for sub-runs
+            with mlflow.start_run(run_name="child_run_" + str(i), nested=True):  # Use nested=True for sub-runs
                 # Get metrics from cv_results_
                 mean_test_score = self.grid_search.cv_results_['mean_test_score'][i]
                 std_test_score = self.grid_search.cv_results_['std_test_score'][i]
