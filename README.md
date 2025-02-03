@@ -24,7 +24,10 @@ The project involves:
 8. **Model monitoring & retraining:** Consistently evaluate the model with new data and retrain as necessary.
 
 For detailed explanation on each steps refer the articles I have written on Medium,  
-Part 1 - https://medium.com/@nedwinvivek/end-to-end-mlops-project-with-open-source-tools-78115cc59748 
+Part 1 - https://medium.com/@nedwinvivek/end-to-end-mlops-project-with-open-source-tools-78115cc59748
+ 
 Part 2 - https://medium.com/@nedwinvivek/end-to-end-mlops-project-with-open-source-tools-a241951e68cf 
+
 Part 3 - https://medium.com/@nedwinvivek/end-to-end-mlops-project-with-open-source-tools-72952eb4997a 
+
 Part 4 - https://medium.com/@nedwinvivek/end-to-end-mlops-project-with-open-source-tools-6ad1eb2bf6dd 
