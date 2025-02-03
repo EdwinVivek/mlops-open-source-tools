@@ -63,7 +63,7 @@ class DataDriftTestReport(GenerateReport):
 
 
 class Monitoring:
-    def __init__(self, strategy = DataDriftReport):
+    def __init__(self, strategy = DataDriftReport()):
         self._strategy = strategy
         self._workspace = None
         self._project = None

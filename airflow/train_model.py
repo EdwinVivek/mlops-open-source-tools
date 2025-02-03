@@ -35,14 +35,13 @@ class TrainModel():
         logging.info("engine init")
         Y_hist = pd.read_sql(str.format("select house_id, price from public.house_target_sql"), con=engine)
         store = self.f_store.get_feature_store()
-        logging.info("store init")
+        logging.info("feature store initalized")
         X_hist = self.f_store.get_online_features(store, pd.DataFrame(Y_hist["house_id"]))
         X_hist["price"] = Y_hist["price"]
         return X_hist
 
     def predict_new_data(self):
         path = os.getcwd() + "//serving//feedback.csv"
-        #path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), "serving/feedback.csv")
         X_new = pd.read_csv(path)
         X_new.drop(["event_timestamp", "prediction"], axis=1, inplace=True)
         lr_model = self.house_model.load_model()
@@ -61,7 +60,6 @@ class TrainModel():
         X_combined = combined_data.drop(columns=["price", "proxy_target", "house_id"])
         y_combined = combined_data["price"]
         print(combined_data)
-        logging.info("combine data called")
         #self.train_model(X_combined, y_combined)
         self.house_model.train_model(X_combined, y_combined, test_size=0.1)
         print("Model re-trained and saved as model.pkl")

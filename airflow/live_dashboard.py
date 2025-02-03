@@ -233,14 +233,14 @@ class Dashboard():
         self.create_live_dashboard(project)
 
         conf = CollectorConfig(
-            trigger = IntervalTrigger(interval=30),
+            trigger = IntervalTrigger(interval=5),
             report_config = rep_config,
             project_id = str(project.id)
         )
         self.client.create_collector(id=COLLECTOR_ID, collector=conf)
 
         conf_qual = CollectorConfig(
-            trigger = IntervalTrigger(interval=30),
+            trigger = IntervalTrigger(interval=5),
             report_config = qual_rep_config,
             project_id = str(project.id)
         )
@@ -290,7 +290,5 @@ if __name__ == "__main__":
     dashboard.send_data_to_collector()
     print("Triggered monitoring")
     logging.info("Triggered monitoring")
-    #dashboard.client.send_data(COLLECTOR_ID, current)
-    #dashboard.client.send_data(COLLECTOR_TEST_ID, current)
 
 
