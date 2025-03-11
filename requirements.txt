@@ -13,4 +13,4 @@ seaborn
 matplotlib
 psycopg
 psycopg_pool
-
+deepchecks

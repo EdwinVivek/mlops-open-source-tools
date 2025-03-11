@@ -26,6 +26,21 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Run Model Validation (Deepchecks)
+      run: python ci_cd/validation.py
+    
+    - name: Upload Deepchecks Report to GitHub Pages
+      if: always()
+      run: |
+        mkdir -p gh-pages
+        mv deepchecks_report.html gh-pages/
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./gh-pages
+
     - name: Train model
       run: |  
         python ci_cd/train.py
