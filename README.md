@@ -1,3 +1,5 @@
+<h1>End-to-End MLOps project with Open Source tools</h1>
+
 In this project, we will develop a machine learning workflow utilizing the MLOps pipeline. We will employ some of the open-source tools to construct the MLOps pipeline. This pipeline will encompass the full lifecycle of machine learning model development, which includes data preprocessing, model training, feature engineering, model monitoring, deployment, and implementing CI/CD pipelines.
 
 When discussing the automation of the MLOps pipeline, it is important to highlight the role of Continuous Monitoring. Therefore, we will incorporate a feedback loop to complete the MLOps cycle through Continuous monitoring and re-training of the ML model.
